@@ -302,10 +302,8 @@ class PrivateRecipeAPITests(TestCase):
         recipe = create_recipe(user=self.user)
         recipe.tags.add(tag)
 
-        payload = {"tag": []}
+        payload = {"tags": []}
         url = detail_url(recipe.id)
         res = self.client.patch(url, payload, format="json")
-        print(recipe.tags.all())
-        recipe.refresh_from_db()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.tags.count(), 0)
