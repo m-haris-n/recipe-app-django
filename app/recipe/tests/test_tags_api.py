@@ -24,7 +24,7 @@ def detail_url(id):
 
 def create_user(email="user@example.com", password="testpass123"):
     """creates a returns a new user"""
-    return get_user_model().objects.create_user(email=password, password=password)
+    return get_user_model().objects.create_user(email=email, password=password)
 
 
 class PublicTagsApiTest(TestCase):
