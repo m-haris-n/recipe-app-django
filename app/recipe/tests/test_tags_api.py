@@ -1,7 +1,7 @@
 """
 tests for tags api
 """
-
+from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
@@ -9,7 +9,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Tag
+from core.models import Tag, Recipe
 
 from recipe.serializers import TagSerializer
 
@@ -102,3 +102,52 @@ class PrivateTagsApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         tags = Tag.objects.filter(user=self.user)
         self.assertFalse(tags.exists())
+
+    def test_filter_tags_assigned_to_recipes(self):
+        """test listing  ingredients by those assigned to recipes"""
+
+        ing1 = Tag.objects.create(user=self.user, name="Apple")
+        ing2 = Tag.objects.create(user=self.user, name="Turkey")
+
+        recipe = Recipe.objects.create(
+            title="Apply Crumble",
+            time_minutes=5,
+            price=Decimal("2.5"),
+            user=self.user,
+        )
+
+        recipe.tags.add(ing1)
+
+        res = self.client.get(TAGS_URL, {"assigned_only": 1})
+
+        s1 = TagSerializer(ing1)
+        s2 = TagSerializer(ing2)
+
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
+
+    def test_filtered_tags_unique(self):
+        """test filtered tags are unique"""
+
+        ing = Tag.objects.create(user=self.user, name="Eggs")
+        Tag.objects.create(user=self.user, name="Lentils")
+
+        recipe1 = Recipe.objects.create(
+            title="Egg Crumble",
+            time_minutes=5,
+            price=Decimal("2.5"),
+            user=self.user,
+        )
+        recipe2 = Recipe.objects.create(
+            title="Crumble Egg",
+            time_minutes=5,
+            price=Decimal("2.5"),
+            user=self.user,
+        )
+
+        recipe1.tags.add(ing)
+        recipe2.tags.add(ing)
+
+        res = self.client.get(TAGS_URL, {"assigned_only": 1})
+
+        self.assertEqual(len(res.data), 1)
