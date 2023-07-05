@@ -186,7 +186,10 @@ class PrivateRecipeAPITests(TestCase):
     def test_update_user_returns_errror(self):
         """Test changing recipe user results in error"""
 
-        new_user = create_user(email="newuser@example.com", password="newpass123")
+        new_user = create_user(
+            email="newuser@example.com",
+            password="newpass123",
+        )
         recipe = create_recipe(user=self.user)
 
         payload = {"user": new_user}
@@ -211,7 +214,10 @@ class PrivateRecipeAPITests(TestCase):
     def test_recipe_other_users_recipe_error(self):
         """Test trying to delete other user's recipe gives error"""
 
-        new_user = create_user(email="newuser@example.com", password="newpass123")
+        new_user = create_user(
+            email="newuser@example.com",
+            password="newpass123",
+        )
         recipe = create_recipe(user=new_user)
 
         url = detail_url(recipe.id)
@@ -391,18 +397,27 @@ class PrivateRecipeAPITests(TestCase):
         res = self.client.patch(url, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        new_ingredient = Ingredient.objects.get(user=self.user, name="Limes")
+        new_ingredient = Ingredient.objects.get(
+            user=self.user,
+            name="Limes",
+        )
         self.assertIn(new_ingredient, recipe.ingredients.all())
 
     def test_update_recipe_assign_ingredient(self):
         """test assigning an exising ingredients when updating a recipe"""
 
-        ingredient_salt = Ingredient.objects.create(user=self.user, name="Salt")
+        ingredient_salt = Ingredient.objects.create(
+            user=self.user,
+            name="Salt",
+        )
 
         recipe = create_recipe(user=self.user)
         recipe.ingredients.add(ingredient_salt)
 
-        ingredient_pepper = Ingredient.objects.create(user=self.user, name="Pepper")
+        ingredient_pepper = Ingredient.objects.create(
+            user=self.user,
+            name="Pepper",
+        )
 
         payload = {"ingredients": [{"name": "Pepper"}]}
         url = detail_url(recipe.id)
