@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "changeme")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 ALLOWED_HOSTS.extend(
     filter(
         None,
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "user",
     "recipe",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -59,6 +60,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = "app.urls"
@@ -153,3 +156,8 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
+
+
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "https://bitnine-clone.vercel.app/"]
+
+CORS_ALLOW_CREDENTIALS = True
